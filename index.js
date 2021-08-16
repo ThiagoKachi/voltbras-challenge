@@ -1,23 +1,38 @@
-const { ApolloServer, gql } = require('apollo-server');
-import { getGithubUser } from './dataSources'
+import { ApolloServer, gql } from 'apollo-server';
+import { getPlanetsList } from './dataSources'
 
 const typeDefs = gql`
   type Planet {
-    pl_name: String!
+    pl_name: ID!
+    hostname: String!
     pl_bmassj: String!
+    disc_year: Int!
+    disc_locale: String!
   }
 
   type Query {
-    suitablePlanets: [Planet]
+    suitablePlanets: [Planet!]!
+  }
+
+  type Mutation {
+    installStation(id: String!): Planet
   }
 `;
 
 const resolvers = {
   Query: {
     suitablePlanets: async (obj, args, context) => {
-      return context.dataSources.githubUser.getUser();
-    }
-  }
+      return context.dataSources.planetsList.getPlanet();
+    },
+  },
+
+  // Mutation: {
+  //   installStation: (_, args) => {
+  //     const planetSearched = .find((planet) => planet.pl_name === args.id)
+  //     const installed = planetSearched.createStation = true
+  //     return installed
+  //   }
+  // }
 };
 
 const server = new ApolloServer({
@@ -25,7 +40,7 @@ const server = new ApolloServer({
   resolvers,
   dataSources: () => {
     return {
-      githubUser: new getGithubUser()
+      planetsList: new getPlanetsList()
     };
   }
 });
