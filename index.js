@@ -35,13 +35,11 @@ const resolvers = {
       const planetsList = await context.dataSources.planetsList.getPlanet();
       return schema.insertMany(planetsList)
     },
-    // Query para montar o banco de dados com o rsultado da API
-    planets: () => schema.find(), // Lista os planetas atualizados
-    stations: () => schema.find({ hasstation: { $eq: true } }), // Listar somente os planetas que contém uma estação instalada
+    planets: () => schema.find(),
+    stations: () => schema.find({ hasstation: { $eq: true } })
   },
 
   Mutation: {
-    // Instala uma estação de abastecimento no planeta
     installStation: (_, { id, data }) => schema.findByIdAndUpdate(id, data, { new: true }),
     recharge: (_, { id }) => schema.findByIdAndUpdate(id, {$set: {recharge: new Date(new Date().getTime() + 1000 * 86400 * 15)}}),
   }
