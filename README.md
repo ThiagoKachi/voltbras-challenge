@@ -24,12 +24,19 @@ Instale as dependências
 ```bash
 npm install
 ```
+Crie dentro do package.json
+```bash
+"scripts": {
+    "dev": "npx nodemon --exec babel-node index.js"
+  },
+```
 
 Inicie o servidor
 
 ```bash
 npm run dev
 ```
+
 
 OBS: Necessita que o mongo esteja rodando, optei em rodar pelo Docker.
   - Pequeno tutorial de como fazer: https://balta.io/blog/mongodb-docker
