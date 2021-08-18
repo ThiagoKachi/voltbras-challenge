@@ -1,38 +1,54 @@
 import { ApolloServer, gql } from 'apollo-server';
 import { getPlanetsList } from './dataSources'
 
+import schema from './infosDB';
+
+import mongoose from 'mongoose';
+
+mongoose.connect('mongodb://localhost:27017/graphql', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+
 const typeDefs = gql`
   type Planet {
-    pl_name: ID!
+    _id: ID!
     hostname: String!
     pl_bmassj: String!
     disc_year: Int!
-    disc_locale: String!
+    hasstation: Boolean
+  }
+
+  input InputType {
+    hasstation: Boolean!
   }
 
   type Query {
     suitablePlanets: [Planet!]!
+    planets: [Planet!]!
+    stations: [Planet!]!
   }
 
   type Mutation {
-    installStation(id: String!): Planet
+    installStation(id: ID!, data: InputType!): Planet!
   }
 `;
 
 const resolvers = {
   Query: {
     suitablePlanets: async (obj, args, context) => {
-      return context.dataSources.planetsList.getPlanet();
+      const planetsList = await context.dataSources.planetsList.getPlanet();
+      return schema.insertMany(planetsList)
     },
+    // Query para montar o banco de dados com o rsultado da API
+    planets: () => schema.find(), // Lista os planetas atualizados
+    stations: () => schema.find({ hasstation: { $eq: true } }), // Listar somente os planetas que contém uma estação instalada
   },
 
-  // Mutation: {
-  //   installStation: (_, args) => {
-  //     const planetSearched = .find((planet) => planet.pl_name === args.id)
-  //     const installed = planetSearched.createStation = true
-  //     return installed
-  //   }
-  // }
+  Mutation: {
+    installStation: (_, { id, data }) => schema.findByIdAndUpdate(id, data, { new: true })
+    // Instala uma estação de abastecimento no planeta
+  }
 };
 
 const server = new ApolloServer({
