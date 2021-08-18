@@ -20,6 +20,10 @@ const Schema = new mongoose.Schema({
   hasstation: {
     type: Boolean,
     default: false
+  },
+  recharge: {
+    type: String,
+    default: null
   }
 })
 

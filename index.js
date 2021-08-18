@@ -16,11 +16,16 @@ const typeDefs = gql`
     hostname: String!
     pl_bmassj: String!
     disc_year: Int!
-    hasstation: Boolean
+    hasstation: Boolean!
+    recharge: String
   }
 
-  input InputType {
+  input InputTypeStation {
     hasstation: Boolean!
+  }
+
+  input InputTypeRecharge {
+    recharge: String!
   }
 
   type Query {
@@ -30,7 +35,8 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    installStation(id: ID!, data: InputType!): Planet!
+    installStation(id: ID!, data: InputTypeStation!): Planet!
+    recharge(id: ID!): Planet!
   }
 `;
 
@@ -46,8 +52,9 @@ const resolvers = {
   },
 
   Mutation: {
-    installStation: (_, { id, data }) => schema.findByIdAndUpdate(id, data, { new: true })
     // Instala uma estação de abastecimento no planeta
+    installStation: (_, { id, data }) => schema.findByIdAndUpdate(id, data, { new: true }),
+    recharge: (_, { id }) => schema.findByIdAndUpdate(id, {$set: {recharge: new Date()}}),
   }
 };
 
@@ -65,3 +72,7 @@ const server = new ApolloServer({
 server.listen().then(({ url }) => {
   console.log(`🚀 Server ready at ${url}`);
 });
+
+
+// Documentar
+// Incrementar horas na Mutation 'recharge' e fazer verificação
